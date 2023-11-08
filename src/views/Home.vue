@@ -24,6 +24,11 @@ if (token) {
   console.log("Le token n'a pas été trouvé dans localStorage.");
   router.replace("/");
 }
+ function logout() {
+
+    localStorage.removeItem("token"); 
+  }
+
 </script>
 
 <template>
@@ -60,6 +65,12 @@ if (token) {
               <span>{{ userData.surname }}</span>
             </div>
           </li>
+          <li>
+            <form action="">
+              <button type="submit" @click="logout()">Logout</button>
+            </form>
+          </li>
+          
         </ul>
       </NavBar>
 
@@ -194,6 +205,17 @@ a {
 </style> -->
 
 <style scoped>
+button{
+    outline: none;
+               border: 1px solid #541554 ;
+               border-radius: 10%;
+               padding: 10px 20px;
+               font-size: 20px;
+               font-weight: bold;
+               font-family: "Poppins-Black";
+               background-color: #541554;
+
+}
 ul {
   display: flex;
   align-items: center;

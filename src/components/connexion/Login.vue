@@ -5,7 +5,7 @@
         <div class="input-field">
           <h1>Login</h1>
         </div>
-        <form @submit.prevent="login">
+        <form @submit.prevent="login(),showToatSuccess()">
           <div class="input-field">
             <input type="text" placeholder="email" v-model="userData.email" />
           </div>
@@ -31,9 +31,8 @@
             <!-- <input type="submit" value="Login" /> -->
 
             <button
-              type="button"
-              @click="showToatSuccess(),login()"
-              style="z-index: 1000"
+              type="submit"
+    
             >
               Login
             </button>
@@ -77,6 +76,7 @@ const login = async function () {
 
       userData.value.email = "";
       userData.value.password = "";
+      error.value = 'You are now logged'
 
       /*   Cookies.set("token", userExist.data.token,{ expires: '1h' }); */
       const token = localStorage.getItem("token");
@@ -95,8 +95,8 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
 function showToatSuccess() {
-  toast.success("Wow success!", {
-    autoClose: 1000,
+  toast.success(error.value, {
+    autoClose: 2000,
   });
 }
 </script>

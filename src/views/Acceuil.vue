@@ -3,8 +3,6 @@ import NavBar from "@/components/NavBar.vue";
 </script>
 
 <template>
-  
-
   <div class="banner">
     <div class="banner-opacity">
       <NavBar>

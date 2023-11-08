@@ -11,20 +11,16 @@
                                         <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
                                             <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar" />
                                         </a>
-                                        <div class="chat-about">
-                                            <h6 class="m-b-0">Aiden Chavez</h6>
+                                        <div class="chat-about" >
+                                            <h6 class="m-b-0">{{users}}</h6>
                                             <small>Last seen: 2 hours ago</small>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 hidden-sm text-right">
-                                        <a href="javascript:void(0);" class="btn btn-outline-secondary"><i
-                                                class="fa fa-camera"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-outline-primary"><i
-                                                class="fa fa-image"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-outline-info"><i
-                                                class="fa fa-cogs"></i></a>
-                                        <a href="javascript:void(0);" class="btn btn-outline-warning"><i
-                                                class="fa fa-question"></i></a>
+                                    <div class="col-lg-6 hidden-sm text-right d-flex justify-content-end">
+                                        <a href="javascript:void(0);" class="btn btn-outline-secondary"><RouterLink to="/home"><homeSvg/></RouterLink></a>
+                                        <a href="javascript:void(0);" class="btn btn-outline-primary"><RouterLink to=""><phoneSvg/></RouterLink></a>
+                                        <a href="javascript:void(0);" class="btn btn-outline-info"><RouterLink to=""><microSvg/></RouterLink></a>
+                                        <a href="javascript:void(0);" class="btn btn-outline-warning"><RouterLink to="/info"><userSvg /></RouterLink></a>
                                     </div>
                                 </div>
                             </div>
@@ -41,7 +37,41 @@
         </div>
     </div>
 </template>
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import searchSvg from '../icons /searchSvg.vue';
+import { ref, onMounted } from 'vue';
+import { clientHttp } from "../../libs/clientHttps";
+import { RouteLocationNormalizedLoaded, useRoute } from "vue-router";
+import homeSvg from '../icons /homeSvg.vue';
+import phoneSvg from '../icons /phoneSvg.vue';
+import microSvg from '../icons /videoSvg.vue';
+import userSvg from '../icons /userSvg.vue';
+
+  const users = ref("");
+  const route: RouteLocationNormalizedLoaded = useRoute();
+
+  const getUser = async () => {
+  try {
+
+const id = ref('') 
+ const user_Id = id.value = route.params.id;
+ console.log(user_Id);
+ 
+    const userExist = await clientHttp.get(`/users/friend/${user_Id}` );
+    users.value = userExist.data.name
+    console.log(users.value);
+    
+
+
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+onMounted(getUser);
+
+</script>
 <style scoped>
 body {
     background-color: #f4f7f6;
@@ -322,7 +352,7 @@ body {
     .chat-app .chat-list {
         height: 480px;
         overflow-x: auto;
-    }
+    }   
 
     .chat-app .chat-history {
         height: calc(100vh - 350px);

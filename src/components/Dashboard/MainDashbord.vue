@@ -1,38 +1,159 @@
 <template>
+    <form v-if="!realBlock.user" action="" @submit="blocage ()">
+        <button style="outline: none; padding: 10px 20px; border: 1px #fff solid;border-radius: 20%; background-color: #fff;" type="submit">Lock User<lockSvg style="margin-left: 10px ;"/></button>
+    </form>
+    <form v-if="realBlock.user" action="" @submit="unLock()">
+        <button style="outline: none; padding: 10px 20px; border: 1px #fff solid;border-radius: 20%; background-color: #fff;" type="submit">UnLock User<unlockSvg style="margin-left: 10px ;"/></button>
+    </form>
     <div style="height:100%;">
         <div class="chat-history">
-            <ul class="m-b-0">
-                <li class="clearfix">
+            <ul class="m-b-0" >
+                <li class="clearfix" v-for=" Message in UserMessages">
                     <div class="message-data text-right" style="display: flex;justify-content: end;">
-                        <span class="message-data-time">10:10 AM, Today</span>
+                        <span class="message-data-time">10:10 AM, Today </span>
                         <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar" />
                     </div>
-                    <div class="message other-message float-right">
-                        Hi Aiden, how are you? How is the project coming along?
+                    <div class="message other-message float-right" >
+                     {{Message.contenu}}
                     </div>
                 </li>
-                <li class="clearfix">
+                <li class="clearfix" v-for=" Message2 in UserMessage2">
                     <div class="message-data">
                         <span class="message-data-time">10:12 AM, Today</span>
                     </div>
-                    <div class="message my-message">Are we meeting today?</div>
-                </li>
-                <li class="clearfix">
-                    <div class="message-data">
-                        <span class="message-data-time">10:15 AM, Today</span>
-                    </div>
-                    <div class="message my-message">
-                        Project has been already finished and I have results to show
-                        you.
-                    </div>
+                    <div class="message my-message"> {{Message2.contenu}}</div>
                 </li>
             </ul>
         </div>
-        <sendMessageInput />
+        <sendMessageInput v-if="!realBlock.user" style="position: relative; "/>
     </div>
 </template>
 <script lang="ts" setup>
+
 import sendMessageInput from '@/components/Dashboard/sendMessageInput.vue'
+
+import sendSvg from '../icons /sendSvg.vue';
+import unlockSvg from '../icons /unlockSvg.vue';
+import NavBar from "../NavBar.vue";
+import { RouterLink } from "vue-router";
+import router from "@/router";
+import { clientHttp } from "../../libs/clientHttps";
+import { onMounted, ref } from "vue";
+import lockSvg from '../icons /lockSvg.vue';
+import axios from "axios";
+import { loadEnv } from 'vite';
+const error = ref("")
+
+const UserMessages = ref([]);
+const UserMessage2 = ref([]);
+            const userData = ref({
+            email: "",
+            name: "",
+            username: "",
+            surname: "",
+            id:""
+            });
+
+const token = localStorage.getItem("token");
+if (token) {
+  const decodedToken = JSON.parse(atob(token.split(".")[1]));
+  userData.value.email = decodedToken.email;
+  userData.value.name = decodedToken.name;
+  userData.value.surname = decodedToken.surname;
+  userData.value.username = decodedToken.username;
+  userData.value.id =decodedToken.id
+} else {
+  console.log("Le token n'a pas été trouvé dans localStorage.");
+  router.replace("/");
+}  
+
+ const userMessage =ref({
+    sender_id:"",
+    receiver_id:""
+ })
+ const userMessage2 =ref({
+    sender_id:"",
+    receiver_id:""
+ })
+
+ async function getMessage() {
+    try {
+    
+    const conversation_id = localStorage.getItem("conversation_id")
+    userMessage.value.sender_id = userData.value.id
+    userMessage.value.receiver_id = conversation_id
+
+    
+    if (
+        userMessage.value.sender_id.trim() === ""||
+        userMessage.value.receiver_id.trim() === ""
+      ) {
+        error.value = "Tous les champs sont requis";
+    
+        console.log("Tous les champs sont requis");
+      } else {
+    
+    const userExist = await clientHttp.post(`/message/OneMessage/${conversation_id}` , userMessage.value);
+    UserMessages.value = userExist.data.slice(0, 1000);
+
+    console.log(UserMessages.value);
+    
+      }
+    
+     } catch (error) {
+         
+        console.log(error);
+        
+     }
+ }
+
+ async function getMessage2() {
+    const conversation_id = userData.value.id
+    userMessage2.value.sender_id = localStorage.getItem('conversation_id')
+    userMessage2.value.receiver_id = userData.value.id
+
+ const userExist2 = await clientHttp.post(`/message/OneMessage/${conversation_id}` , userMessage2.value);
+    UserMessage2.value = userExist2.data.slice(0,1000)
+ } 
+ const realBlock = ref({
+user :""
+ })
+ const bloque = ref({
+    utilisateur_id:"",
+    utilisateur_bloque_id :""
+ })
+ async function blocage (){
+  bloque.value.utilisateur_id = userData.value.id 
+  bloque.value.utilisateur_bloque_id = localStorage.getItem('conversation_id')
+
+    const bloqueExist =  await clientHttp.post("/blocage/sendBlock" , bloque.value);
+      console.log(bloqueExist);
+      
+
+ }
+ async function getBlock(){
+  bloque.value.utilisateur_id = userData.value.id 
+  bloque.value.utilisateur_bloque_id = localStorage.getItem('conversation_id')
+    const bloqueExist2 =  await clientHttp.post("/blocage/getBlock", bloque.value);
+    console.log('toto');
+    realBlock.value.user =  bloqueExist2.data.utilisateur_id
+    console.log(realBlock.value.user);
+ }
+ async function unLock(){
+    
+    const bloqueExist3 =  await clientHttp.get(`/blocage/unlock/${ bloque.value.utilisateur_id}/${  bloque.value.utilisateur_bloque_id}`);
+   
+    console.log(bloqueExist3);
+    
+    
+      
+
+ }
+ onMounted(getMessage)
+ onMounted(getMessage2)
+ onMounted(getBlock)
+
+
 </script>
 <style scoped>
 body {
@@ -151,6 +272,7 @@ body {
     padding: 20px;
     border-bottom: 2px solid #fff;
     height: 80%;
+    overflow-y: auto;
 }
 
 .chat .chat-history ul {
@@ -262,7 +384,7 @@ body {
     float: right;
 }
 
-.clearfix:after {
+    .clearfix:after {
     visibility: hidden;
     display: block;
     font-size: 0;

@@ -4,12 +4,12 @@ import Login from '@/views/Login.vue'
 import Register from '@/views/register.vue'
 import Verify from '@/views/VerifyEmail.vue'
 import Acceuil from '@/views/Acceuil.vue'
+import Info from '@/views/Info.vue'
 
 //Dashboard
 import MainDashbordVue from '@/components/Dashboard/MainDashbord.vue'
 import UserLayout from '@/views/layout/UserLayoutView.vue'
-import testView from '@/views/testView.vue'
-import test2View from '@/views/test2View.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +17,10 @@ const router = createRouter({
     {
       path: '/',
       component: Acceuil
+    },
+    {
+      path: '/info',
+      component: Info
     },
     {
       path: '/home',
@@ -41,19 +45,11 @@ const router = createRouter({
       component: UserLayout,
       children: [
         {
-          path: '/maindashboard',
+          path: '/maindashboard/:id',
           name: 'maindashboard',
           component: MainDashbordVue
         },
-        {
-          path: '/testView',
-          component: testView
-        }
-        ,
-        {
-          path: '/test2View',
-          component: test2View
-        }
+        
       ]
     }
   ]

@@ -78,12 +78,14 @@ const register = async function () {
         "email",
         userData.data.PersonalId.email
       );
+      error.value = "you are now registered"
 
-      console.log(userData.data);
+      console.log(userData);
 
       router.replace("/verify");
-    } catch (error) {
-      console.log(error);
+    } catch (e) {
+      console.log(e);
+      error.value = "Something went wrong"
     }
   }
 };
@@ -93,9 +95,8 @@ import "vue3-toastify/dist/index.css";
 
 function showToatSuccess() {
   
-  
-  toast.success("Wow success!", {
-    autoClose: 1000,
+  toast.success(error.value, {
+    autoClose: 2000,
   });
 }
 </script>
